@@ -1,0 +1,26 @@
+{
+  "name": "pact-ai",
+  "version": "1.0.1",
+  "description": "AI Git Workflow Assistant - Generate semantic commits and PRs",
+  "main": "src/index.js",
+  "bin": {
+    "pact": "bin/pact.js"
+  },
+  "type": "module",
+  "keywords": [
+    "git",
+    "ai",
+    "commit",
+    "conventional-commits",
+    "workflow",
+    "automation"
+  ],
+  "author": "Riflo <rifloahmad@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "node bin/pact.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  }
+}
