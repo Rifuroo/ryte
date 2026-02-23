@@ -12,21 +12,21 @@
 
 ![RYTE Demo](demo.gif)
 
-## Introduction
+Writing meaningful commit messages shouldn't feel like extra work. But in fast-paced teams, it often does. 
 
-Writing meaningful commit messages and well-structured Pull Requests is critical for team collaboration, but it’s often a friction point in a fast-paced development cycle. 
-
-**ryte** is your CLI companion that **bridges** the gap between "coding" and "documenting". It reads your git diffs, understands the context of your changes, and generates professional, semantic-compliant messages in seconds.
+**RYTE** is your AI-powered CLI companion that **bridges** the gap between "coding" and "documenting". It reads your git diffs, understands the context of your changes, and generates professional, semantic-compliant messages in seconds.
 
 ### Core Value
-- **Zero Friction**: Stay in the terminal. No Web UI, no heavy extensions.
-- **Semantic by Default**: Automatically follows [Conventional Commits](https://www.conventionalcommits.org/).
-- **Intelligent Context**: Infers motivation from diffs and branch names.
-- **Interactive Control**: You are always in charge with an `Accept/Edit/Regenerate` workflow.
+- **Stay in Flow**: No context switching. Pure terminal workflow.
+- **Structured by Default**: Clean Conventional Commits automatically.
+- **Context-Aware**: Understands diffs and branch intent.
+- **Human-in-the-Loop**: Accept, edit, or regenerate — your call.
 
 ---
 
 ## ⚡ Quick Start
+
+> ⚡ **TL;DR**: `git add .` → `ryte c` → **done.**
 
 ```bash
 # 1. Install globally
@@ -76,6 +76,18 @@ With `ryte c`, it looks like this:
 > `feat(auth): implement JWT refresh token rotation via HTTP-only cookies`
 
 One command. Same diff. Clean history.
+
+---
+
+## 🧑‍💻 Built for Developers Who Care
+
+If your git history looks like:
+- `fix`
+- `update`
+- `asdf`
+- `final-final-real`
+
+**RYTE is for you.**
 
 ---
 
@@ -145,6 +157,8 @@ Introduces a complete JWT-based authentication system, including login, registra
 3. **Generation**: Crafts a semantic message (feat, fix, chore, etc.) based on the actual logic changes.
 4. **Interaction**: Presents a TUI (Terminal UI) for you to review and finalize the entry.
 
+The result? **AI assistance without surrendering control.**
+
 ---
 
 ## Why Not Just Use GitHub Copilot?
@@ -156,6 +170,7 @@ Fair question. Here's an honest comparison:
 | Works natively in terminal | ❌ | ✅ |
 | Diff-aware (reads what you actually changed) | ❌ | ✅ |
 | Enforces Conventional Commits format | ❌ | ✅ |
+| Works with any editor | ❌ | ✅ |
 | No IDE required | ❌ | ✅ |
 | Free tier available | ❌ | ✅ (via Groq) |
 | BYOK (Bring Your Own Key) | ❌ | ✅ |
@@ -185,7 +200,7 @@ We understand that sending code to an external API is a sensitive decision. Here
 
 ## Configuration
 
-**ryte** requires an API key to function. We support high-performance LLM providers like Groq and OpenAI.
+**RYTE** requires an API key to function. We support high-performance LLM providers like Groq and OpenAI.
 
 ### Groq (Recommended - Free & Instant)
 Get your free key at [console.groq.com](https://console.groq.com/keys).
@@ -212,14 +227,26 @@ export OPENAI_API_KEY="sk-..."
 
 We believe that **every commit should be written right**. A clean git history is not just about aesthetics; it's about debuggability, revertability, and understanding the "why" behind the code months after it was written.
 
+*Your future self will thank you.*
+
+---
+
+## ⭐ Why Developers Love It
+
+- **No more “wip” commits**: No more generic, lazy history.
+- **Cleaner PR reviews**: Reviewers understand the *why* instantly.
+- **Better team collaboration**: Professional communication by default.
+- **Future-proof project history**: Debug and revert with confidence.
+
 ---
 
 ## Roadmap
 
-- [ ] **Context-Aware Radius**: Analyze importing files to suggest impact warnings.
-- [ ] **JIRA / Linear / GitHub Issues**: Automatic ticket status sync.
-- [ ] **Custom Rulesets**: Define your own commit linting rules for the AI.
+- [ ] **GitHub Action**: Automate commit linting and PR generation in CI/CD.
+- [ ] **Custom Rulesets**: Define your own organization-specific commit styles.
+- [ ] **Ticket Integration**: Automatic JIRA / Linear / GitHub Issues syncing.
 - [ ] **Local LLM Support**: Support for Ollama/Llama.cpp for offline-only environments.
+- [ ] **Context-Aware Radius**: Analyze importing files to suggest impact warnings.
 
 ---
 
@@ -242,6 +269,9 @@ A: No. It only sends the `git diff` of your staged changes. It automatically ign
 
 **Q: Is it free?**  
 A: The tool itself is free. If you use Groq, the API usage is currently free. If you use OpenAI, you pay for what you use (extremely cheap, ~$0.01 for dozens of commits).
+
+**Q: Can I use this in a private company repository?**  
+A: **Yes.** RYTE only sends the staged diff to your configured AI provider using your own API key (BYOK). No code or credentials are ever stored by RYTE itself.
 
 ---
 
