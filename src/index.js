@@ -22,8 +22,11 @@ function editInteractively(initialText) {
         const tmpFile = path.join(os.tmpdir(), `ryte_edit_${Date.now()}.txt`);
         fs.writeFileSync(tmpFile, initialText, "utf-8");
 
-        const editor = process.env.EDITOR || "vim";
-        console.log(`\nOpening in ${editor}... Close the editor to save.`);
+        const defaultEditor = process.platform === "win32" ? "notepad" : "vim";
+        const editor = process.env.EDITOR || defaultEditor;
+
+        console.log(`\n\x1b[33m💡 Tip: Don't forget to SAVE (Ctrl+S) before closing the editor!\x1b[0m`);
+        console.log(`Opening in ${editor}... Close the editor to save.`);
         try {
             execSync(`${editor} ${tmpFile}`, { stdio: "inherit" });
             const result = fs.readFileSync(tmpFile, "utf-8").trim();
@@ -136,7 +139,7 @@ async function main() {
  \x1b[1;38;5;39m╚═╝  ╚═╝\x1b[1;38;5;63m   ╚═╝   \x1b[1;38;5;129m   ╚═╝   \x1b[1;38;5;161m╚══════╝\x1b[0m
 
   \x1b[90mAI-Powered Git Workflow Assistant\x1b[0m
-  \x1b[90mv1.1.1 | by Riflo\x1b[0m
+  \x1b[90mv1.1.2 | by Riflo\x1b[0m
 
   \x1b[33mCOMMANDS:\x1b[0m
   \x1b[32mryte c\x1b[0m     Generate semantic commit from diff

@@ -44,9 +44,13 @@ export async function generateAIResponse(messages) {
             if (response.status === 429) {
                 // Rate limited — parse retry-after header or use exponential backoff
                 const retryAfter = parseInt(response.headers.get("retry-after") || "15", 10);
-                const waitMs = (retryAfter + 1) * 1000;
-                console.warn(`\x1b[33m⚠ Rate limit hit. Waiting ${retryAfter + 1}s before retry (${attempt}/${MAX_RETRIES})...\x1b[0m`);
-                await new Promise(r => setTimeout(r, waitMs));
+                const waitSeconds = retryAfter + 1;
+
+                for (let i = waitSeconds; i > 0; i--) {
+                    process.stdout.write(`\r\x1b[33m⚠ Rate limit hit. Waiting ${i}s before retry (${attempt}/${MAX_RETRIES})...\x1b[0m`);
+                    await new Promise(r => setTimeout(r, 1000));
+                }
+                process.stdout.write("\r" + " ".repeat(80) + "\r"); // Clear the line
                 continue;
             }
 
