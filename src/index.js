@@ -136,7 +136,7 @@ async function main() {
  \x1b[1;38;5;39m╚═╝  ╚═╝\x1b[1;38;5;63m   ╚═╝   \x1b[1;38;5;129m   ╚═╝   \x1b[1;38;5;161m╚══════╝\x1b[0m
 
   \x1b[90mAI-Powered Git Workflow Assistant\x1b[0m
-  \x1b[90mv1.0.4 | by Riflo\x1b[0m
+  \x1b[90mv1.1.1 | by Riflo\x1b[0m
 
   \x1b[33mCOMMANDS:\x1b[0m
   \x1b[32mryte c\x1b[0m     Generate semantic commit from diff
