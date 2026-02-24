@@ -18,8 +18,13 @@ export function getConfig() {
     }
     try {
         const data = fs.readFileSync(CONFIG_FILE, "utf-8");
-        return { ...DEFAULT_CONFIG, ...JSON.parse(data) };
+        const parsed = JSON.parse(data);
+        // Ensure some basic structure integrity
+        if (typeof parsed !== "object" || parsed === null) throw new Error("Invalid config format");
+        return { ...DEFAULT_CONFIG, ...parsed };
     } catch (e) {
+        console.warn(`\n\x1b[33m⚠ Warning: Configuration file is corrupted. Re-initializing...\x1b[0m`);
+        // If corrupted, return null so setupFlow triggers or we can fallback
         return null;
     }
 }

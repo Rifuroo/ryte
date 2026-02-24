@@ -45,16 +45,62 @@ export async function generateAIResponse(messages, overrideConfig = null) {
             }
 
             if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error?.message || "API request failed");
+                let errorData;
+                try {
+                    errorData = await response.json();
+                } catch (e) {
+                    throw new Error(`HTTP Error ${response.status}: ${response.statusText}`);
+                }
+                throw new Error(errorData.error?.message || `API request failed with status ${response.status}`);
             }
 
             const data = await response.json();
-            return data.choices[0].message.content.trim();
+            if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+                throw new Error("Invalid response format from AI provider.");
+            }
+
+            const content = data.choices[0].message.content;
+            if (!content) {
+                throw new Error("AI provider returned an empty response.");
+            }
+
+            const trimmed = content.trim();
+
+            // Deterministic Internal Contract Prep
+            // Currently returns { text: string, structured: Object }
+            return parseAICommitMessage(trimmed);
         } catch (e) {
+            // Check for network errors (Offline)
+            if (e.code === 'ENOTFOUND' || e.code === 'EAI_AGAIN') {
+                throw new Error("Network unreachable. Please check your internet connection.");
+            }
+
             if (attempt === MAX_RETRIES) {
-                throw e; // Let the caller handle the final failure
+                throw e;
             }
         }
     }
+}
+
+/**
+ * Parses a conventional commit message into a structured object.
+ * This is the 'Deterministic Contract' for the engine.
+ */
+function parseAICommitMessage(text) {
+    const lines = text.split("\n");
+    const header = lines[0].trim();
+
+    // Simple regex for conventional commit: type(scope): subject
+    const match = header.match(/^(\w+)(?:\(([^)]+)\))?:\s*(.+)$/);
+
+    return {
+        text: text, // The full raw text for legacy compatibility
+        structured: {
+            header: header,
+            type: match ? match[1] : "other",
+            scope: match ? match[2] : null,
+            subject: match ? match[3] : header,
+            body: lines.slice(1).filter(l => l.trim().length > 0).join("\n").trim() || null
+        }
+    };
 }
