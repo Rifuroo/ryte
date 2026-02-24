@@ -1,28 +1,19 @@
-import dotenv from "dotenv";
-dotenv.config();
+import { getConfig } from "./config.js";
+import { getProviderConfig } from "./provider.js";
 
-export async function generateAIResponse(messages) {
-    const groqKey = process.env.GROQ_API_KEY;
-    const openAiKey = process.env.OPENAI_API_KEY;
+export async function generateAIResponse(messages, overrideConfig = null) {
+    const config = overrideConfig || getConfig();
 
-    if (!groqKey && !openAiKey) {
-        console.error("Error: Please set either GROQ_API_KEY (for free AI) or OPENAI_API_KEY in your environment variables.");
-        process.exit(1);
+    if (!config || !config.apiKey) {
+        throw new Error("API Key not found. Please run 'ryte config' or follow the setup flow.");
     }
 
-    const isGroq = !!groqKey;
-    const apiKey = isGroq ? groqKey : openAiKey;
+    const providerName = config.provider || "openai";
+    const pConfig = getProviderConfig(providerName, config.baseUrl);
 
-    // Groq API is 100% compatible with OpenAI's format! Just changing URL & Model.
-    const apiUrl = isGroq
-        ? "https://api.groq.com/openai/v1/chat/completions"
-        : "https://api.openai.com/v1/chat/completions";
-
-    // llama-3.1-8b-instant: 14,400 TPM (6x higher than llama-3.3-70b-versatile)
-    // Still very capable for commit messages and PR summaries
-    const model = isGroq
-        ? "llama-3.1-8b-instant"
-        : "gpt-4o-mini";
+    const apiUrl = pConfig.url;
+    const apiKey = config.apiKey;
+    const model = config.model || pConfig.model;
 
     const MAX_RETRIES = 3;
 
@@ -42,7 +33,6 @@ export async function generateAIResponse(messages) {
             });
 
             if (response.status === 429) {
-                // Rate limited — parse retry-after header or use exponential backoff
                 const retryAfter = parseInt(response.headers.get("retry-after") || "15", 10);
                 const waitSeconds = retryAfter + 1;
 
@@ -50,7 +40,7 @@ export async function generateAIResponse(messages) {
                     process.stdout.write(`\r\x1b[33m⚠ Rate limit hit. Waiting ${i}s before retry (${attempt}/${MAX_RETRIES})...\x1b[0m`);
                     await new Promise(r => setTimeout(r, 1000));
                 }
-                process.stdout.write("\r" + " ".repeat(80) + "\r"); // Clear the line
+                process.stdout.write("\r" + " ".repeat(80) + "\r");
                 continue;
             }
 
@@ -63,8 +53,7 @@ export async function generateAIResponse(messages) {
             return data.choices[0].message.content.trim();
         } catch (e) {
             if (attempt === MAX_RETRIES) {
-                console.error("AI Generation failed:", e.message);
-                process.exit(1);
+                throw e; // Let the caller handle the final failure
             }
         }
     }

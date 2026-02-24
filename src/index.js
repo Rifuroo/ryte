@@ -6,11 +6,15 @@ import path from "path";
 import { getStagedDiff, getCurrentBranch, getBranchCommits, applyCommit } from "./git.js";
 import { generateAIResponse } from "./ai.js";
 import { COMMIT_SYSTEM_PROMPT, PR_SYSTEM_PROMPT } from "./prompt.js";
+import { getConfig, setConfig, hasValidConfig } from "./config.js";
+import { PROVIDERS } from "./provider.js";
 
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 });
+
+const VERSION = "1.2.0";
 
 async function question(query) {
     return new Promise(resolve => rl.question(query, resolve));
@@ -38,6 +42,43 @@ function editInteractively(initialText) {
             resolve(initialText);
         }
     });
+}
+
+async function setupFlow() {
+    console.log("\n\x1b[36mWelcome to RYTE. Let's set up your Git Intelligence Layer.\x1b[0m");
+    console.log("------------------------------------------------------------");
+
+    console.log("\nSelect your LLM Provider:");
+    const providerList = Object.keys(PROVIDERS);
+    providerList.forEach((p, i) => console.log(`${i + 1}) ${p.charAt(0).toUpperCase() + p.slice(1)}`));
+
+    const choice = await question(`\nChoose [1-${providerList.length}]: `);
+    const providerKey = providerList[parseInt(choice) - 1] || "openai";
+
+    const apiKey = await question(`Paste your ${providerKey.toUpperCase()} API Key: `);
+    if (!apiKey) {
+        console.error("Error: API Key is required.");
+        process.exit(1);
+    }
+
+    setConfig({
+        provider: providerKey,
+        apiKey: apiKey,
+        model: PROVIDERS[providerKey].defaultModel
+    });
+
+    console.log("\n\x1b[32m✔ Configuration saved to ~/.ryte/config.json\x1b[0m");
+}
+
+async function handleConfig() {
+    const config = getConfig() || {};
+    console.log("\n\x1b[36mCurrent Configuration:\x1b[0m");
+    console.log(JSON.stringify(config, null, 2));
+
+    const choice = await question("\nWould you like to reset configuration? [y/N]: ");
+    if (choice.toLowerCase() === "y") {
+        await setupFlow();
+    }
 }
 
 async function interactiveLoop(initialResult, type) {
@@ -125,10 +166,16 @@ async function main() {
     const args = process.argv.slice(2);
     const cmd = args[0]?.toLowerCase();
 
+    if (!hasValidConfig()) {
+        await setupFlow();
+    }
+
     if (cmd === "c" || cmd === "commit") {
         await handleCommit();
     } else if (cmd === "pr") {
         await handlePR();
+    } else if (cmd === "config") {
+        await handleConfig();
     } else {
         console.log(`
   \x1b[1;38;5;39m██████╗ \x1b[1;38;5;63m██╗   ██╗\x1b[1;38;5;129m████████╗\x1b[1;38;5;161m███████╗\x1b[0m
@@ -139,16 +186,16 @@ async function main() {
   \x1b[1;38;5;39m╚═╝  ╚═╝\x1b[1;38;5;63m   ╚═╝   \x1b[1;38;5;129m   ╚═╝   \x1b[1;38;5;161m╚══════╝\x1b[0m
   
   \x1b[1;38;5;46m[ THE AI-POWERED GIT INFRASTRUCTURE ]\x1b[0m
-  \x1b[90mv1.1.3 | by Riflo\x1b[0m
+  \x1b[90mv${VERSION} | by Riflo\x1b[0m
 
   \x1b[33mCOMMANDS:\x1b[0m
-  \x1b[32mryte c\x1b[0m     Generate semantic commit from diff
-  \x1b[32mryte pr\x1b[0m    Generate PR markdown from branch commits
+  \x1b[32mryte c\x1b[0m      Generate semantic commit from diff
+  \x1b[32mryte pr\x1b[0m     Generate PR markdown from branch commits
+  \x1b[32mryte config\x1b[0m Generate or edit your local configuration
 
-  \x1b[33mGETTING STARTED:\x1b[0m
-  Set either environment variable to unleash the AI:
-  • \x1b[36mGROQ_API_KEY\x1b[0m   (Recommended / Free tier)
-  • \x1b[36mOPENAI_API_KEY\x1b[0m (OpenAI API key)
+  \x1b[33mONBOARDING:\x1b[0m
+  No .env required. Run \x1b[32mryte config\x1b[0m or just run \x1b[32mryte c\x1b[0m to 
+  start the interactive setup.
         `);
     }
 
