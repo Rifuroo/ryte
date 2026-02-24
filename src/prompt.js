@@ -15,7 +15,9 @@ RULES:
 6. Scope: If the diff is localized, infer a scope (e.g., "auth", "ui", "config").
 7. Body (Optional): If the change is complex, add a brief body after 1 blank line to explain technical nuances.
 8. Context: If a branch name or ticket is provided, incorporate it into the scope or footer if applicable.
-9. Anti-Plagiarism: If the diff shows documentation changes containing example commit messages, DO NOT copy those examples. Always synthesize a new message describing the actual change.
+9. Anti-Hallucination: Documentation files (like README.md) often contain example commit messages (e.g., "feat(auth): ..."). DO NOT assume these examples are the topic of the current change.
+10. Logical Validation: Your suggested <scope> must be derived from actual modified logic in the diff, not from text inside code blocks, comments, or examples within a documentation file.
+11. If only README.md or docs are changed, the type MUST be "docs" and the scope should relate to the documentation structure (e.g., "readme", "config", "intro"), NOT the example code inside it.
 
 Example:
 feat(ui): add loading state to checkout button
