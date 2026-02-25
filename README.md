@@ -26,21 +26,33 @@ Writing meaningful commit messages shouldn't feel like extra work. But in fast-p
 
 ## ⚡ Quick Start
 
-> ⚡ **TL;DR**: `git add .` → `ryte c` → **done.**
+> ⚡ **Zero-Config**: RYTE will guide you through the setup on your first run. No manual `.env` file needed.
 
 ```bash
 # 1. Install globally
 npm install -g @riflo/ryte
 
-# 2. Set your free AI key (get one at console.groq.com)
-# Mac/Linux:
-export GROQ_API_KEY="gsk_..."
-# Windows (PowerShell):
-$env:GROQ_API_KEY="gsk_..."
-
-# 3. Stage your changes and go
+# 2. Stage your changes
 git add .
+
+# 3. Just run and go
 ryte c
+```
+
+*RYTE will ask for your AI provider and API key once, then save it securely for all future sessions.*
+
+**Interactive Setup Example:**
+```text
+Select your LLM Provider:
+1) OpenAI
+2) Groq
+3) OpenRouter
+4) Local
+
+Choose [1-4]: 2
+Paste your GROQ API Key: gsk_****************************
+
+✔ Configuration saved to ~/.ryte/config.json
 ```
 
 ---
